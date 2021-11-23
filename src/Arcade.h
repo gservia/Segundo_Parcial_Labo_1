@@ -55,9 +55,11 @@ int arcade_getNombreJuego(Arcade* this, char* nombreJuego);
 
 int arcade_findById(LinkedList* listArcades, int id);
 int arcade_load(Arcade* pArcade);
-int arcade_edit(Arcade* pArcade);
+int arcade_edit(Arcade* pArcade, int option);
 int arcade_print(Arcade* pArcade);
 int arcade_compareByNombreJuego(void* pArcadeA, void* pArcadeB);
 int arcade_compareById(void* pArcadeA, void* pArcadeB);
+int arcade_compareMultijugador(void* pArcade);
+void doubleFichasMax(void* pAux);
 
 #endif /* ARCADE_H_ */

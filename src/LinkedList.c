@@ -404,13 +404,11 @@ int ll_contains(LinkedList* this, void* pElement)
 
     if (this != NULL)
     {
+    	returnAux = 0;
+
     	if (ll_indexOf(this, pElement) >= 0)
     	{
         	returnAux = 1;
-    	}
-    	else
-    	{
-        	returnAux = 0;
     	}
     }
     return returnAux;
@@ -554,3 +552,59 @@ int ll_sort(LinkedList* this, int (*pFunc)(void*, void*), int order)
     return returnAux;
 }
 
+
+/** \brief Filtra los arcades que tienen mas de 1 jugador
+ * \param pList LinkedList* Puntero a la lista
+ * \param pFunc (*pFunc) Puntero a la funcion criterio
+ * \return Retorna la lista filtrada
+ */
+LinkedList* ll_filter(LinkedList* this, int (*pFunc)(void*))
+{
+	int criterio;
+	void* pAuxiliar;
+	int i;
+	LinkedList* listaFiltrada = NULL;
+
+	if (this != NULL && pFunc != NULL)
+	{
+		listaFiltrada = ll_newLinkedList();
+
+		for (i = 0; i < ll_len(this); i++)
+		{
+			pAuxiliar = ll_get(this, i);
+
+			criterio = pFunc(pAuxiliar);
+
+			if (criterio == 1)
+			{
+				ll_add(listaFiltrada, pAuxiliar);
+			}
+		}
+	}
+	return listaFiltrada;
+}
+
+
+/** \brief Modifica todos los elementos de la lista con un mismo criterio especifico
+ * \param pList LinkedList* Puntero a la lista
+ * \param pFunc (*pFunc) Puntero a la funcion criterio
+ * \return Retorna 0 si tuvo exito y -1 si this es NULL
+ */
+int ll_map(LinkedList* this, void (*pFunc)(void*))
+{
+	int returnAux = -1;
+	int i;
+	void* pAuxiliar;
+
+	if (this != NULL && pFunc != NULL)
+	{
+		for (i = 0; i < ll_len(this); i++)
+		{
+			pAuxiliar = ll_get(this, i);
+
+			pFunc(pAuxiliar);
+		}
+		returnAux = 0;
+	}
+	return returnAux;
+}

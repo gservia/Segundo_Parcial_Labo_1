@@ -3,6 +3,7 @@
 #include <string.h>
 #include "LinkedList.h"
 #include "Arcade.h"
+#include "Juego.h"
 #include "Controller.h"
 
 
@@ -205,11 +206,12 @@ int controller_getLastIdFromFile(char* path, int* id)
  * \return int
  *
  */
-int controller_editArcade(LinkedList* pArrayListArcade)
+int controller_editArcade(LinkedList* pArrayListArcade, LinkedList* pArrayListJuego)
 {
 	int state = -1;
 	int idToEdit;
 	int position;
+	int option;
 	Arcade* pArcadeAux;
 
 	if (pArrayListArcade != NULL)
@@ -225,16 +227,41 @@ int controller_editArcade(LinkedList* pArrayListArcade)
 
 					if (pArcadeAux != NULL)
 					{
-						if (arcade_edit(pArcadeAux) == 0)
+						printf("¿Que campo desea modificar?\n 1. Cantidad de jugadores\n 2. Nombre del juego\n 3. Finalizar y regresar al menu\n");
+
+						if (utn_getInt(&option, "Ingresar la opcion deseada: ", "Error: comando no valido\n", 1, 3, 0) == 0)
 						{
-							state = 0;
+							if (option == 1)
+							{
+								if (arcade_edit(pArcadeAux, option) == 0)
+								{
+									state = 0;
+								}
+							}
+							else if (option == 2)
+							{
+								if (listaJuego_createGamesFile(pArrayListArcade, pArrayListJuego) == 0)
+								{
+									listaJuego_ListGame(pArrayListJuego);
+									if (arcade_edit(pArcadeAux, option) == 0)
+									{
+										state = 0;
+									}
+								}
+							}
+							else if (option == 3)
+							{
+								if (arcade_edit(pArcadeAux, option) == 0)
+								{
+									state = 0;
+								}
+							}
 						}
 					}
 					else
 					{
 						printf("\n=== ID ingresado inexistente ===\n");
 					}
-
 				}
 				else
 				{
@@ -245,6 +272,7 @@ int controller_editArcade(LinkedList* pArrayListArcade)
 	}
     return state;
 }
+
 
 /** \brief Baja de arcade
  *
@@ -274,6 +302,8 @@ int controller_removeArcade(LinkedList* pArrayListArcade)
 
 				if (pArcadeAux != NULL)
 				{
+					printf("\nID	| NACIONALIDAD 	| SONIDO	| JUGADORES	| FICHAS MAX	| SALON		| NOMBRE DEL JUEGO\n");
+					arcade_print(pArcadeAux);
 					if (utn_getInt(&confirm, "\n¿Estas seguro que quieres eliminar a este arcade? Toda su informacion sera eliminada\n 1. Si\n 2. No\nIngrese una opcion: ",
 								"Error: comando no valido\n", 1, 2, 0) == 0)
 					{
@@ -323,7 +353,7 @@ int controller_ListArcade(LinkedList* pArrayListArcade)
 		len = ll_len(pArrayListArcade);
 		if (len > 0)
 		{
-			printf("ID	| NACIONALIDAD 	| TIPO DE SONIDO	| CANT. JUGADORES	| FICHAS MAX	| SALON		| NOMBRE DEL JUEGO\n");
+			printf("\nID	| NACIONALIDAD 	| SONIDO	| JUGADORES	| FICHAS MAX	| SALON		| NOMBRE DEL JUEGO\n");
 
 			for (i = 0; i < len; i++)
 			{
@@ -394,7 +424,8 @@ int controller_sortArcade(LinkedList* pArrayListArcade)
     return state;
 }
 
-/** \brief Guarda los datos de los empleados en el archivo .csv
+
+/** \brief Guarda los datos de los arcades en el archivo .csv
  *
  * \param path char*
  * \param pArrayListArcade LinkedList*

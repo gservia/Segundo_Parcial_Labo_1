@@ -14,6 +14,7 @@
 #include "menu.h"
 #include "LinkedList.h"
 #include "Controller.h"
+#include "ListaJuego.h"
 
 /**************************************************************************************
     Menu:
@@ -54,6 +55,7 @@ int main(void) {
 	setbuf(stdout, NULL);
 
 	LinkedList* listArcades = ll_newLinkedList();
+	LinkedList* listJuegos = ll_newLinkedList();
 
 	int flagContinue;
 	int menuOptionSelected;
@@ -69,15 +71,22 @@ int main(void) {
 		switch (menuOptionSelected)
 		{
 			case 1:
-            	if (controller_loadFromText("arcades.csv", listArcades) == 0)
-            	{
-            		printf("\n=== Carga de archivo satisfatoria ===\n");
-            		flagLoadFileTxt = 0;
-            	}
-            	else
-            	{
-            		printf("\n=== Error al cargar archivo ===\n");
-            	}
+				if (flagLoadFileTxt == -1)
+				{
+	            	if (controller_loadFromText("arcades.csv", listArcades) == 0)
+	            	{
+	            		printf("\n=== Carga de archivo satisfatoria ===\n");
+	            		flagLoadFileTxt = 0;
+	            	}
+	            	else
+	            	{
+	            		printf("\n=== Error al cargar archivo ===\n");
+	            	}
+				}
+				else
+				{
+					printf("\n=== El archivo ya fue cargado en sistema ===\n");
+				}
 				break;
 
 			case 2:
@@ -102,14 +111,14 @@ int main(void) {
 			case 3:
 				if (flagLoadFileTxt == 0)
 				{
-                	if (controller_editArcade(listArcades) == 0)
-                	{
-                		printf("\n=== Modificacion de arcade satisfatoria ===\n");
-                	}
-                	else
-                	{
-                		printf("\n=== Error al modificar arcade ===\n");
-                	}
+					if (controller_editArcade(listArcades, listJuegos) == 0)
+		            {
+		                printf("\n=== Modificacion de arcade satisfatoria ===\n");
+		            }
+		            else
+		            {
+		                printf("\n=== Error al modificar arcade ===\n");
+		            }
 				}
 				else
 				{
@@ -161,15 +170,57 @@ int main(void) {
 				break;
 
 			case 6:
-				printf("Generar archivo de juegos\n");
+				if (flagLoadFileTxt == 0)
+				{
+					if (listaJuego_createGamesFile(listArcades, listJuegos) == 0)
+					{
+						if (listaJuego_saveGamesFile("juegos.txt", listJuegos) == 0)
+						{
+							printf("\n=== Archivo con lista de juegos guardado con exito ===\n");;
+						}
+	                	else
+	                	{
+	                		printf("\n=== Algo salio mal. No es posible guardar la lista de juegos ===\n");
+	                	}
+					}
+                	else
+                	{
+                		printf("\n=== Algo salio mal. No es posible crear la lista de juegos ===\n");
+                	}
+				}
+				else
+				{
+					printf("\n=== Realizar lectura de archivo en sistema. Seleccione la opcion 1 ===\n");
+				}
 				break;
 
 			case 7:
-				printf("Generar archivo con arcades Multijugador\n");
+				if (flagLoadFileTxt == 0)
+				{
+					LinkedList* listaMultijugador = ll_newLinkedList();
+					listaMultijugador = ll_filter(listArcades, arcade_compareMultijugador);
+					controller_saveAsText("multijugador.csv", listaMultijugador);
+					ll_deleteLinkedList(listaMultijugador);
+					printf("\n=== Archivo con juegos multijugador creado con exito ===\n");
+				}
+				else
+				{
+					printf("\n=== Realizar lectura de archivo en sistema. Seleccione la opcion 1 ===\n");
+				}
 				break;
 
 			case 8:
-				printf("Actualizar cantidad de fichas\n");
+				if (flagLoadFileTxt == 0)
+				{
+					if (ll_map(listArcades, doubleFichasMax) == 0)
+					{
+						printf("\n=== Se duplicaron la cantidad de fichas de todos los arcades con exito ===\n");
+					}
+				}
+				else
+				{
+					printf("\n=== Realizar lectura de archivo en sistema. Seleccione la opcion 1 ===\n");
+				}
 				break;
 
 			case 9:
@@ -200,6 +251,10 @@ int main(void) {
             					break;
             			}
             		}
+				}
+				else
+				{
+					printf("\n=== Realizar lectura de archivo en sistema. Seleccione la opcion 1 ===\n");
 				}
 				break;
 

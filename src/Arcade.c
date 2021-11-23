@@ -430,18 +430,13 @@ int arcade_load(Arcade* pArcade)
  * \param pArcade
  * \return int Return (-1) if Error [Invalid length or NULL pointer or without free space] - (0) if OK
  */
-int arcade_edit(Arcade* pArcade)
+int arcade_edit(Arcade* pArcade, int option)
 {
 	int state = -1;
     int cant_jugAux;
     char nombreJuegoAux[NOMBRE_LEN];
-	int option;
 
 	do {
-		printf("¿Que campo desea modificar?\n 1. Cantidad de jugadores\n 2. Nombre del juego\n 3. Finalizar y regresar al menu\n");
-
-		if (utn_getInt(&option, "Ingresar la opcion deseada: ", "Error: comando no valido\n", 1, 3, 0) == 0)
-		{
 			switch (option)
 			{
 				case 1:
@@ -450,7 +445,9 @@ int arcade_edit(Arcade* pArcade)
 					{
 						arcade_setCantJug(pArcade, cant_jugAux);
 						printf("\n=== Cantidad de jugadores modificada con exito ===\n\n");
+						option = 3;
 						state = 0;
+						break;
 					}
 					else
 					{
@@ -458,12 +455,14 @@ int arcade_edit(Arcade* pArcade)
 					}
 					break;
 				case 2:
-					if (utn_getText(nombreJuegoAux, NOMBRE_LEN, "Ingresar nombre del juego: ",
+					if (utn_getText(nombreJuegoAux, NOMBRE_LEN, "\nIngresar nombre del juego: ",
 							    		    		"Error en la carga del nombre\n", 0) == 0)
 					{
 						arcade_setNombreJuego(pArcade, nombreJuegoAux);
 						printf("\n=== Nombre de juego modificado con exito ===\n\n");
 						state = 0;
+						option = 3;
+						break;
 					}
 					else
 					{
@@ -477,7 +476,6 @@ int arcade_edit(Arcade* pArcade)
 					printf("Solo se aceptan opciones de 1 a 3\n");
 					break;
 			}
-		}
 	} while (option != 3);
 	return state;
 }
@@ -583,3 +581,32 @@ int arcade_compareById(void* pArcadeA, void* pArcadeB)
 	}
 	return state;
 }
+
+
+/**
+ * \brief Compare if one Arcade is multiplayer
+ * \param pArcade
+ * \return int Return (1) if cant_jug > 1
+ *                    (0) if cant_jug <= 1
+ */
+int arcade_compareMultijugador(void* pArcade)
+{
+	int state = 0;
+
+	if (((Arcade*)pArcade)->cant_jug > 1)
+	{
+		state = 1;
+	}
+	return state;
+}
+
+
+/**
+ * \brief Set the double of fichas_max in each Arcade
+ * \param pAux
+ */
+void doubleFichasMax(void* pAux)
+{
+	((Arcade*)pAux)->fichas_max = (((Arcade*)pAux)->fichas_max) * 2;
+}
+
